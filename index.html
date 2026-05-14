@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LojaTech</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f4f4;
+      text-align: center;
+    }
+
+    h1 {
+      background: #111;
+      color: white;
+      padding: 15px;
+    }
+
+    .produto {
+      background: white;
+      margin: 20px auto;
+      padding: 15px;
+      width: 250px;
+      border-radius: 10px;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>LojaTech - Eletrônicos</h1>
+
+<div id="products"></div>
+
+<script>
+const API_URL = "http://localhost:3000"; // depois vamos trocar
+
+fetch(API_URL + "/api/products")
+  .then(res => res.json())
+  .then(products => {
+    const div = document.getElementById("products");
+
+    products.forEach(p => {
+      div.innerHTML += `
+        <div class="produto">
+          <h3>${p.name}</h3>
+          <p>R$ ${p.price}</p>
+          <button onclick='comprar(${JSON.stringify(p)})'>
+            Comprar
+          </button>
+        </div>
+      `;
+    });
+  });
+
+async function comprar(produto) {
+  const res = await fetch(API_URL + "/api/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ items: [produto] })
+  });
+
+  const data = await res.json();
+
+  window.location.href = data.url;
+}
+</script>
+
+</body>
+</html>
